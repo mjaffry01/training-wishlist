@@ -107,7 +107,8 @@
   .toolbar input { margin: 0; background: var(--surface); }
   .ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); white-space: nowrap; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+  .layout > * { min-width: 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 16px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
   .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
   .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; flex: none; background: var(--accent-soft); color: var(--accent); }
@@ -142,8 +143,8 @@
     </div>
   </header>
 
-  <div id="demoBanner" class="banner" hidden>
-    Demo mode: the Google Sheet isn't connected yet, so entries are saved only in this browser. Set <code>API_URL</code> in index.html to go live.
+  <div id="setupBanner" class="banner" hidden>
+    This board isn't connected to its Google Sheet yet, so wishes can't be saved. Please check back soon.
   </div>
 
   <div class="layout">
@@ -182,7 +183,7 @@
   const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
   const REFRESH_MS = 30000;
 
-  const DEMO = !/^https:\/\/script\.google\.com\//.test(API_URL);
+  const CONFIGURED = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(API_URL);
   const $ = (id) => document.getElementById(id);
   let entries = [];
 
@@ -211,7 +212,6 @@
   }
 
   async function fetchEntries() {
-    if (DEMO) return JSON.parse(store('wishlist-demo') || 'null') || entries;
     let data;
     try {
       data = await request({ cache: 'no-store' });
@@ -223,14 +223,6 @@
   }
 
   async function saveEntry(name, wishes, website) {
-    if (DEMO) {
-      const list = JSON.parse(store('wishlist-demo') || 'null') || [...entries];
-      const i = list.findIndex((e) => e.name.toLowerCase() === name.toLowerCase());
-      const entry = { name, wishes, updated: new Date().toISOString() };
-      if (i >= 0) list[i] = entry; else list.push(entry);
-      store('wishlist-demo', JSON.stringify(list));
-      return list;
-    }
     // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight.
     const data = await request({
       method: 'POST',
@@ -346,10 +338,16 @@
   $('wishes').addEventListener('input', updateCount);
   $('refresh').addEventListener('click', () => { setMsg(''); load(); });
 
-  $('demoBanner').hidden = !DEMO;
   $('name').value = store('wishlist-name') || '';
-  load();
-  setInterval(() => { if (!document.hidden) load(true); }, REFRESH_MS);
+  if (CONFIGURED) {
+    load();
+    setInterval(() => { if (!document.hidden) load(true); }, REFRESH_MS);
+  } else {
+    $('setupBanner').hidden = false;
+    $('submit').disabled = true;
+    $('refresh').disabled = true;
+    $('grid').innerHTML = '<div class="empty">The board will appear here once it is connected.</div>';
+  }
 </script>
 </body>
 </html>

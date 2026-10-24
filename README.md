@@ -30,7 +30,7 @@ Open `index.html` and replace the placeholder near the bottom:
 const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
 ```
 
-with your `/exec` URL. Until you do this the page runs in **demo mode**, which saves entries only in your own browser.
+with your `/exec` URL. Until you do this the page shows a "not connected" notice and saving is turned off.
 
 ## 3. Host it on GitHub Pages
 
