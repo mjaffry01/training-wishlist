@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Wish List</title>
+<meta name="description" content="Share what you want to get out of the training. Everyone's wishes are visible here.">
+<meta name="theme-color" content="#4f5bd5">
+<meta property="og:title" content="Training Wish List">
+<meta property="og:description" content="Add your name and what you want from the training. Everyone can see the board.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f5bd5'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --surface-2: #f0f2f8;
+    --text: #1c2030;
+    --muted: #61687d;
+    --border: #e2e5ee;
+    --accent: #4f5bd5;
+    --accent-ink: #ffffff;
+    --accent-soft: #eceefc;
+    --ok: #1f8a5b;
+    --err: #c2413b;
+    --shadow: 0 1px 2px rgba(20, 24, 40, .05), 0 4px 16px rgba(20, 24, 40, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12141c;
+      --surface: #1b1e29;
+      --surface-2: #232736;
+      --text: #e8eaf2;
+      --muted: #9aa1b5;
+      --border: #2d3244;
+      --accent: #8b94ff;
+      --accent-ink: #12141c;
+      --accent-soft: #262b46;
+      --ok: #4cc38a;
+      --err: #f07a72;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12141c;
+    --surface: #1b1e29;
+    --surface-2: #232736;
+    --text: #e8eaf2;
+    --muted: #9aa1b5;
+    --border: #2d3244;
+    --accent: #8b94ff;
+    --accent-ink: #12141c;
+    --accent-soft: #262b46;
+    --ok: #4cc38a;
+    --err: #f07a72;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 64px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 4px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0; }
+  .stats { display: flex; gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; min-width: 96px; }
+  .stat b { display: block; font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 12px; }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
+  form.panel { position: sticky; top: 16px; }
+  @media (max-width: 860px) { form.panel { position: static; } }
+  .panel h2 { font-size: 17px; margin: 0 0 4px; }
+  .panel p.hint { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+
+  label { display: block; font-weight: 600; font-size: 13px; margin: 0 0 6px; }
+  input, textarea {
+    width: 100%; font: inherit; color: var(--text);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 14px;
+  }
+  textarea { min-height: 150px; resize: vertical; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer; border-radius: 10px; border: 0;
+    padding: 11px 16px;
+  }
+  .primary { width: 100%; background: var(--accent); color: var(--accent-ink); }
+  .primary:disabled { opacity: .6; cursor: wait; }
+  .msg { min-height: 20px; font-size: 13px; margin: 10px 0 0; }
+  .msg.ok { color: var(--ok); }
+  .msg.err { color: var(--err); }
+
+  .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .toolbar input { margin: 0; background: var(--surface); }
+  .ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); white-space: nowrap; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; flex: none; background: var(--accent-soft); color: var(--accent); }
+  .who { min-width: 0; }
+  .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .who span { color: var(--muted); font-size: 12px; }
+  .card ul { margin: 0; padding-left: 18px; }
+  .card li { margin: 0 0 6px; overflow-wrap: anywhere; }
+  .card li::marker { color: var(--accent); }
+  .edit { margin-top: auto; padding-top: 12px; align-self: flex-start; background: none; color: var(--accent); padding-left: 0; padding-right: 0; font-size: 13px; }
+
+  .empty { text-align: center; color: var(--muted); padding: 48px 16px; border: 1px dashed var(--border); border-radius: 16px; }
+  .banner { background: var(--accent-soft); color: var(--text); border-radius: 12px; padding: 10px 14px; font-size: 13px; margin-bottom: 20px; }
+  .count { color: var(--muted); font-size: 12px; text-align: right; margin: -10px 0 14px; font-variant-numeric: tabular-nums; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .skeleton { height: 150px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .5; } }
+  @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Training Wish List</h1>
+      <p class="sub">What do you want to get out of the training? Add yours — everyone can see the board.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="statPeople">0</b><span>people</span></div>
+      <div class="stat"><b id="statWishes">0</b><span>wishes</span></div>
+    </div>
+  </header>
+
+  <div id="demoBanner" class="banner" hidden>
+    Demo mode: the Google Sheet isn't connected yet, so entries are saved only in this browser. Set <code>API_URL</code> in index.html to go live.
+  </div>
+
+  <div class="layout">
+    <form id="form" class="panel" autocomplete="off">
+      <h2>Add your wishes</h2>
+      <p class="hint">One wish per line. Submit again with the same name to update your list.</p>
+      <label for="name">Your name</label>
+      <input id="name" name="name" maxlength="60" required placeholder="e.g. Sara Khan">
+      <label for="wishes">Your wish list</label>
+      <textarea id="wishes" name="wishes" maxlength="2000" required placeholder="Hands-on exercises with real data&#10;How to write better prompts&#10;Q&amp;A time at the end"></textarea>
+      <div class="count" id="count">0 / 2000</div>
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this empty</label>
+        <input id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <button class="primary" id="submit" type="submit">Save my wishes</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+
+    <section>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search names or wishes" aria-label="Search">
+        <button class="ghost" id="refresh" type="button">Refresh</button>
+      </div>
+      <div id="grid" class="grid" aria-live="polite">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </section>
+  </div>
+  <footer>Entries are public to everyone with this link. Last refreshed <span id="refreshed">—</span>.</footer>
+</div>
+<noscript><p style="text-align:center">This board needs JavaScript to load.</p></noscript>
+
+<script>
+  // Paste your Apps Script Web App URL here (ends in /exec).
+  const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+  const REFRESH_MS = 30000;
+
+  const DEMO = !/^https:\/\/script\.google\.com\//.test(API_URL);
+  const $ = (id) => document.getElementById(id);
+  let entries = [];
+
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      localStorage.setItem(key, value);
+    } catch (e) { return null; }
+  }
+
+  // ---- data access -------------------------------------------------------
+  // Apps Script can take a few seconds on a cold start, so allow a generous timeout.
+  async function request(options, timeoutMs = 20000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(API_URL, { ...options, signal: ctrl.signal });
+      if (!res.ok) throw new Error('Server error (' + res.status + ').');
+      return await res.json();
+    } catch (err) {
+      if (err.name === 'AbortError') throw new Error('The server took too long to answer. Please try again.');
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function fetchEntries() {
+    if (DEMO) return JSON.parse(store('wishlist-demo') || 'null') || entries;
+    let data;
+    try {
+      data = await request({ cache: 'no-store' });
+    } catch (err) {
+      data = await request({ cache: 'no-store' }); // one retry
+    }
+    if (!data.ok) throw new Error(data.error || 'Could not load the board.');
+    return data.entries;
+  }
+
+  async function saveEntry(name, wishes, website) {
+    if (DEMO) {
+      const list = JSON.parse(store('wishlist-demo') || 'null') || [...entries];
+      const i = list.findIndex((e) => e.name.toLowerCase() === name.toLowerCase());
+      const entry = { name, wishes, updated: new Date().toISOString() };
+      if (i >= 0) list[i] = entry; else list.push(entry);
+      store('wishlist-demo', JSON.stringify(list));
+      return list;
+    }
+    // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight.
+    const data = await request({
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ name, wishes, website })
+    });
+    if (!data.ok) throw new Error(data.error || 'Could not save.');
+    return data.entries;
+  }
+
+  // ---- rendering ---------------------------------------------------------
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function initials(name) {
+    return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+  }
+  function lines(text) {
+    return String(text).split(/\r?\n/).map((l) => l.replace(/^\s*[-*•]\s*/, '').trim()).filter(Boolean);
+  }
+  function ago(iso) {
+    const t = new Date(iso).getTime();
+    if (!t) return '';
+    const s = Math.round((Date.now() - t) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+    return new Date(t).toLocaleDateString();
+  }
+
+  function render() {
+    const q = $('search').value.trim().toLowerCase();
+    const sorted = [...entries].sort((a, b) => new Date(b.updated) - new Date(a.updated));
+    const shown = sorted.filter((e) => !q || (e.name + ' ' + e.wishes).toLowerCase().includes(q));
+
+    $('statPeople').textContent = entries.length;
+    $('statWishes').textContent = entries.reduce((n, e) => n + lines(e.wishes).length, 0);
+
+    if (!shown.length) {
+      $('grid').innerHTML = '<div class="empty">' +
+        (entries.length ? 'No matches for that search.' : 'No wishes yet. Be the first to add yours!') + '</div>';
+      return;
+    }
+    $('grid').innerHTML = shown.map((e) => `
+      <article class="card">
+        <div class="card-head">
+          <div class="avatar">${esc(initials(e.name))}</div>
+          <div class="who"><b>${esc(e.name)}</b><span>${esc(ago(e.updated))}</span></div>
+        </div>
+        <ul>${lines(e.wishes).map((w) => `<li>${esc(w)}</li>`).join('')}</ul>
+        <button class="edit" type="button" data-name="${esc(e.name)}">Edit this list</button>
+      </article>`).join('');
+  }
+
+  function setMsg(text, kind) {
+    $('msg').textContent = text;
+    $('msg').className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  let loaded = false;
+  async function load(quiet) {
+    try {
+      entries = await fetchEntries();
+      loaded = true;
+      render();
+      $('refreshed').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (err) {
+      if (!loaded) $('grid').innerHTML = '<div class="empty">Could not load the board. Check your connection and press Refresh.</div>';
+      if (!quiet) setMsg(err.message || 'Could not load the board. Try Refresh.', 'err');
+    }
+  }
+
+  function updateCount() {
+    $('count').textContent = $('wishes').value.length + ' / 2000';
+  }
+
+  // ---- events ------------------------------------------------------------
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const name = $('name').value.trim();
+    const wishes = $('wishes').value.trim();
+    if (!name || !wishes) return setMsg('Please fill in your name and at least one wish.', 'err');
+
+    $('submit').disabled = true;
+    setMsg('Saving…');
+    try {
+      entries = await saveEntry(name, wishes, $('website').value);
+      loaded = true;
+      store('wishlist-name', name);
+      render();
+      setMsg('Saved! Your wishes are on the board.', 'ok');
+    } catch (err) {
+      setMsg(err.message || 'Could not save. Please try again.', 'err');
+    } finally {
+      $('submit').disabled = false;
+    }
+  });
+
+  $('grid').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.edit');
+    if (!btn) return;
+    const entry = entries.find((e) => e.name === btn.dataset.name);
+    if (!entry) return;
+    $('name').value = entry.name;
+    $('wishes').value = lines(entry.wishes).join('\n');
+    updateCount();
+    setMsg('Editing ' + entry.name + '’s list — save to update it.');
+    $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('wishes').focus();
+  });
+
+  $('search').addEventListener('input', () => { if (loaded) render(); });
+  $('wishes').addEventListener('input', updateCount);
+  $('refresh').addEventListener('click', () => { setMsg(''); load(); });
+
+  $('demoBanner').hidden = !DEMO;
+  $('name').value = store('wishlist-name') || '';
+  load();
+  setInterval(() => { if (!document.hidden) load(true); }, REFRESH_MS);
+</script>
+</body>
+</html>
