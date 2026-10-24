@@ -76,8 +76,19 @@
   .stat b { display: block; font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
   .stat span { color: var(--muted); font-size: 12px; }
 
-  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
   @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+  .board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+  .board-head h2 { font-size: 19px; margin: 0; }
+  .add-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600; border-radius: 10px; padding: 10px 16px; white-space: nowrap; }
+  .card.flash { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 560px) {
+    .wrap { padding-top: 20px; }
+    h1 { font-size: 24px; }
+    header { gap: 12px; margin-bottom: 16px; }
+    .stat { padding: 8px 12px; min-width: 0; }
+    .stat b { font-size: 18px; }
+  }
 
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
   form.panel { position: sticky; top: 16px; }
@@ -140,6 +151,7 @@
     <div class="stats">
       <div class="stat"><b id="statPeople">0</b><span>people</span></div>
       <div class="stat"><b id="statWishes">0</b><span>wishes</span></div>
+      <a class="add-btn" href="#form" id="addBtn">+ Add yours</a>
     </div>
   </header>
 
@@ -148,6 +160,19 @@
   </div>
 
   <div class="layout">
+    <section aria-labelledby="boardTitle">
+      <div class="board-head">
+        <h2 id="boardTitle">Everyone's wishes</h2>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search names or wishes" aria-label="Search">
+        <button class="ghost" id="refresh" type="button">Refresh</button>
+      </div>
+      <div id="grid" class="grid" aria-live="polite">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </section>
+
     <form id="form" class="panel" autocomplete="off">
       <h2>Add your wishes</h2>
       <p class="hint">One wish per line. Submit again with the same name to update your list.</p>
@@ -163,16 +188,6 @@
       <button class="primary" id="submit" type="submit">Save my wishes</button>
       <p class="msg" id="msg" role="status"></p>
     </form>
-
-    <section>
-      <div class="toolbar">
-        <input id="search" type="search" placeholder="Search names or wishes" aria-label="Search">
-        <button class="ghost" id="refresh" type="button">Refresh</button>
-      </div>
-      <div id="grid" class="grid" aria-live="polite">
-        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-      </div>
-    </section>
   </div>
   <footer>Entries are public to everyone with this link. Last refreshed <span id="refreshed">—</span>.</footer>
 </div>
@@ -295,6 +310,17 @@
     }
   }
 
+  // Scroll to a person's card and highlight it briefly, so they see it on the shared board.
+  function showCard(name) {
+    const btn = [...$('grid').querySelectorAll('.edit')]
+      .find((b) => b.dataset.name.toLowerCase() === name.toLowerCase());
+    const card = btn && btn.closest('.card');
+    if (!card) return;
+    card.classList.add('flash');
+    card.scrollIntoView({ block: 'center' });
+    setTimeout(() => card.classList.remove('flash'), 2500);
+  }
+
   function updateCount() {
     $('count').textContent = $('wishes').value.length + ' / 2000';
   }
@@ -312,8 +338,10 @@
       entries = await saveEntry(name, wishes, $('website').value);
       loaded = true;
       store('wishlist-name', name);
+      $('search').value = '';
       render();
       setMsg('Saved! Your wishes are on the board.', 'ok');
+      showCard(name);
     } catch (err) {
       setMsg(err.message || 'Could not save. Please try again.', 'err');
     } finally {
@@ -330,8 +358,14 @@
     $('wishes').value = lines(entry.wishes).join('\n');
     updateCount();
     setMsg('Editing ' + entry.name + '’s list — save to update it.');
-    $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('form').scrollIntoView({ block: 'start' });
     $('wishes').focus();
+  });
+
+  $('addBtn').addEventListener('click', (ev) => {
+    ev.preventDefault();
+    $('form').scrollIntoView({ block: 'start' });
+    $('name').focus({ preventScroll: true });
   });
 
   $('search').addEventListener('input', () => { if (loaded) render(); });
