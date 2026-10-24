@@ -7,6 +7,9 @@ Everyone can see everyone's wishes. No login needed.
 - **API:** Google Apps Script (`apps-script/Code.gs`), deployed as a public Web App
 - **Website:** `index.html`, hosted free on GitHub Pages
 
+**Live board:** https://mjaffry01.github.io/training-wishlist/
+The site is already connected. The steps below are for setting it up again from scratch.
+
 ## 1. Create the Google Sheet + script (about 5 minutes)
 
 1. Go to <https://sheets.new> and name the sheet, e.g. **Training Wish List**.
